@@ -1,0 +1,12 @@
+//  TheVainBoy
+
+CHIP Mux {
+    IN a, b, sel;
+    OUT out;
+
+    PARTS:
+    Not(in=sel, out=notSel);
+    And(a=a, b=notSel, out=aValue);
+    And(a=b, b=sel, out=bValue);
+    Or(a=aValue, b=bValue, out=out);
+}

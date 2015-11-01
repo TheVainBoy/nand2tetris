@@ -1,0 +1,9 @@
+CHIP Not {
+    IN in;
+    OUT out;
+
+    PARTS:
+    Nand(a=in, b=in, out=out);
+}
+
+// Not A == Not(A And A) == A Nand A

@@ -1,0 +1,17 @@
+//  TheVainBoy
+
+CHIP Xor {
+    IN a, b;
+    OUT out;
+
+    PARTS:
+    Or(a=a, b=b, out=orAB);
+    Nand(a=a, b=b, out=nandAB);
+    And(a=orAB, b=nandAB, out=out);
+}
+
+/*
+    A Xor B
+      = (A or B) And Not (A And B)
+      = (A or B) And (A Nand B)
+*/

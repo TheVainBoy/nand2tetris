@@ -1,0 +1,20 @@
+//  TheVainBoy
+
+CHIP Or {
+    IN a, b;
+    OUT out;
+
+    PARTS:
+    Not(in=a, out=notA);
+    Not(in=b, out=notB);
+    Nand(a=notA, b=notB, out=out);
+}
+
+
+/*
+    A Or B
+      = Not Not (A Or B)
+      = Not (Not (A Or B))
+      = Not (Not A And Not B)  (De Morgan)
+      = (Not A) Nand (Not B)
+*/
