@@ -1,4 +1,3 @@
-
 CHIP RAM512 {
     IN in[16], load, address[9];
     OUT out[16];
