@@ -2,20 +2,32 @@
 D=A
 @ADDR
 M=D
-@16383
-D=A
 @COLOUR
-M=D
+M=-1
 @24576
 D=A
-@STOP
+@SCREEN-END
 M=D
+(LOOP)
+    @ADDR
+    D=M
+    @SCREEN-END
+    D=M-D
+    @END
+    D;JEQ
 
+    @COLOUR
+    D=M
+    @ADDR
+    A=M
+    M=D
 
+    @ADDR
+    M=M+1
 
-@COLOUR
-D=M
-@STOP
-A=M
-A=A-1
-M=D
+    @LOOP
+    0;JMP
+
+(END)
+@END
+0;JMP
