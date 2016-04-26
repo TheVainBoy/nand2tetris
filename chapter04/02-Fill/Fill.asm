@@ -1,19 +1,39 @@
+@24576
+D=A
+@KEY
+M=D
+(KEY-LOOP)
+    @KEY
+    A=M
+    D=M
+    @SET-COLOR-WHITE
+    D;JEQ
+    // SET-COLOUR-BLACK
+    @COLOUR
+    M=-1
+    @DRAW-SCREEN
+    0;JMP
+    (SET-COLOR-WHITE)
+    @COLOUR
+    M=0
+    @DRAW-SCREEN
+    0;JMP
+
+(DRAW-SCREEN)
 @SCREEN
 D=A
 @ADDR
 M=D
-@COLOUR
-M=-1
 @24576
 D=A
 @SCREEN-END
 M=D
-(LOOP)
+(DRAW-LOOP)
     @ADDR
     D=M
     @SCREEN-END
     D=M-D
-    @END
+    @KEY-LOOP
     D;JEQ
 
     @COLOUR
@@ -25,9 +45,5 @@ M=D
     @ADDR
     M=M+1
 
-    @LOOP
+    @DRAW-LOOP
     0;JMP
-
-(END)
-@END
-0;JMP
