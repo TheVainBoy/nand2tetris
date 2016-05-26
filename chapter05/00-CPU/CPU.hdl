@@ -1,39 +1,54 @@
 CHIP CPU {
 
-    IN  inM[16],         // M value input  (M = contents of RAM[A])
-        instruction[16], // Instruction for execution
-        reset;           // Signals whether to re-start the current
-                         // program (reset==1) or continue executing
-                         // the current program (reset==0).
+    IN  inM[16],
+        instruction[16],
+        reset;
 
-    OUT outM[16],        // M value output
-        writeM,          // Write to M?
-        addressM[15],    // Address in data memory (of M)
-        pc[15];          // address of next instruction
+    OUT outM[16],
+        writeM,
+        addressM[15],
+        pc[15];
 
     PARTS:
-    // A command & A register
-    Not(in=instruction[0], out=A_command);
-    Mux16(a=ALU_output, b=instruction, sel=A_command, out=A_input);
-    Or(a=A_command, b=instruction[10], out=A_load);
-    Register(in=A_input, load=A_load, out=A);
 
-    // D register
-    Register(in=ALU_output, load=instruction[11], out=D);
+        // A command & A register
+        Not(in=instruction[15], out=ACommand);
+        Mux16(a=AluOutput, b=instruction, sel=ACommand, out=AInput);
+        Or(a=ACommand, b=instruction[5], out=ALoad);
+        ARegister(in=AInput, load=ALoad, out=A, out[0..14]=addressM);
 
-    // A/M Mux
-    Mux16(a=A, b=inM, sel=instruction[3], out=A_M);
+        // A/M Mux
+        Mux16(a=A, b=inM, sel=instruction[12], out=AorM);
 
-    ALU(
-        x=D, y=A_M,
-        zx=instruction[4], nx=instruction[5],
-        zy=instruction[6], ny=instruction[7],
-        f=instruction[8],
-        no=instruction[9],
+        ALU(
+            x=D, y=AorM,
+            zx=instruction[11], nx=instruction[10],
+            zy=instruction[9], ny=instruction[8],
+            f=instruction[7],
+            no=instruction[6],
+            out=AluOutput, out=outM,
+            zr=zero,
+            ng=neg );
 
-        out=ALU_output, out=outM,
-        zr=ALU_zero,
-        ng=ALU_neg );
+        // C command?
+        Not(in=ACommand, out=CCommand);
 
-    // PC(in=A, reset=reset, load=);
+        // D register
+        And(a=CCommand, b=instruction[4], out=DLoad);
+        DRegister(in=AluOutput, load=DLoad, out=D);
+
+        // Write Memory
+        And(a=CCommand, b=instruction[3], out=writeM);
+
+        // Jump & Program Counter
+        Or(a=neg, b=zero, out=lte);
+        Not(in=lte, out=gt);
+        And(a=instruction[0], b=gt, out=jmpGt);
+        And(a=instruction[1], b=zero, out=jmpZero);
+        And(a=instruction[2], b=neg, out=jmpLt);
+        Or8Way(in[0]=jmpGt, in[1]=jmpZero, in[2]=jmpLt, out=jmpMatch);
+        And(a=CCommand, b=jmpMatch, out=jmp);
+        Not(in=jmp, out=inc);
+        PC(in=A, load=jmp, inc=inc, reset=reset, out[0..14]=pc);
+
 }
