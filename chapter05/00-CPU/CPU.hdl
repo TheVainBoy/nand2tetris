@@ -1,0 +1,39 @@
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M?
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+    // A command & A register
+    Not(in=instruction[0], out=A_command);
+    Mux16(a=ALU_output, b=instruction, sel=A_command, out=A_input);
+    Or(a=A_command, b=instruction[10], out=A_load);
+    Register(in=A_input, load=A_load, out=A);
+
+    // D register
+    Register(in=ALU_output, load=instruction[11], out=D);
+
+    // A/M Mux
+    Mux16(a=A, b=inM, sel=instruction[3], out=A_M);
+
+    ALU(
+        x=D, y=A_M,
+        zx=instruction[4], nx=instruction[5],
+        zy=instruction[6], ny=instruction[7],
+        f=instruction[8],
+        no=instruction[9],
+
+        out=ALU_output, out=outM,
+        zr=ALU_zero,
+        ng=ALU_neg );
+
+    // PC(in=A, reset=reset, load=);
+}
